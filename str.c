@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "./str.h"
 
 struct string {
@@ -39,17 +40,35 @@ int compare_from(String *s1, String *s2, int d) {
     int min = s1->len < s2->len ? s1->len : s2->len;
 
     for(int i = d; i < min; i++) {
-        if(s1->c[i] < s2->c[i]) return -1;
-        if(s1->c[i] > s2->c[i]) return 1;
+        if(tolower(s1->c[i]) < tolower(s2->c[i])) return -1;
+        if(tolower(s1->c[i]) > tolower(s2->c[i])) return 1;
     }
 
     // If the prefix is the same
     return s1->len - s2->len;
 }
 
+
+/**
+ * Compares two strings, starting from index 0.
+ * 
+ * The function returns:
+ * < 0, if s1 < s2,
+ * > 0, if s1 > s2,
+ * = 0, if s1 = s2.
+ *  */ 
+int compare(String *s1, String *s2) {
+    return compare_from(s1, s2, 0);
+}
+
 /** Returns the string length. */ 
 int get_string_len(String *string) {
     return string->len;
+}
+
+/** Returns the string content */
+char *get_string_content(String *string) {
+    return string->c;
 }
 
 /**
