@@ -74,3 +74,17 @@ void traverse_list(List *l, act_fnct act) {
         n = n->next;
     }
 }
+
+void iterator_destroy(ListIterator *it) {
+    free(it);
+}
+
+void list_destroy(List *l) {
+    Node *n = l->first;
+    while(n != NULL) {
+        Node *next = n->next;
+        free(n); // libera o nó, não o n->item (que é de outro dono)
+        n = next;
+    }
+    free(l);
+}

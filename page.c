@@ -7,7 +7,7 @@ struct page {
 };
 
 Page *page_create(String *page_name) {
-    Page *page = (Page *) malloc(sizeof(Page *));
+    Page *page = (Page *) malloc(sizeof(Page));
     page->page_name = page_name;
     page->page_rank = -1;
 

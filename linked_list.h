@@ -14,5 +14,7 @@ ListIterator *iterator_create(List *l);
 void *get_and_advance(ListIterator *it);
 void list_insert(List *l, void *item, compare_items cmp_item);
 void traverse_list(List *l, act_fnct act);
+void iterator_destroy(ListIterator *it);
+void list_destroy(List *l);
 
 #endif
