@@ -88,3 +88,17 @@ void list_destroy(List *l) {
     }
     free(l);
 }
+
+// adiciona o item no fim da lista, sem checar repetição
+void list_append(List *l, void *item) {
+    Node *n = (Node *) malloc(sizeof(Node));
+    n->item = item;
+    n->next = NULL;
+
+    if(l->first == NULL) {
+        l->first = l->last = n;
+    } else {
+        l->last->next = n;
+        l->last = n;
+    }
+}
