@@ -27,8 +27,12 @@ RBT *rbt_create() {
 }
 
 RBT *rbt_insert(RBT *root, String *key, void *value, compare_values cmp_val) {
-    root = insert(root, key, value, cmp_val);
-    root->color = BLACK; // a raiz é sempre preta
+    if(root == NULL) {
+        return insert(root, key, value, cmp_val);
+    } else {
+        root = insert(root, key, value, cmp_val);
+        root->color = BLACK; // a raiz é sempre preta
+    }
     return root;
 }
 
@@ -41,7 +45,9 @@ static RBT *insert(RBT *h, String *key, void *value, compare_values cmp_val) {
 
         // cria a lista de valores já com o primeiro valor
         node->list_values = list_create();
-        list_insert(node->list_values, value, cmp_val);
+        // Se o valor é NULL, não insere nada.
+        if(value != NULL) list_insert(node->list_values, value, cmp_val);
+        
 
         return node;
     }
@@ -52,7 +58,9 @@ static RBT *insert(RBT *h, String *key, void *value, compare_values cmp_val) {
     } else if(cmp < 0) {
         h->left = insert(h->left, key, value, cmp_val);
     } else { // chave já está na árvore: adiciona o valor e descarta a chave repetida
-        list_insert(h->list_values, value, cmp_val);
+        // Se o valor é NULL, não insere nada.
+        if(value != NULL) list_insert(h->list_values, value, cmp_val);
+
         string_destroy(key);
     }
 
@@ -80,14 +88,14 @@ List *rbt_search(RBT *h, String *key) {
     return NULL; // não achou
 }
 
-void rbt_destroy(RBT *h) {
+void rbt_destroy(RBT *h, act_fnct free_items_fnct, int free_items) {
     if(h == NULL) return;
 
-    rbt_destroy(h->left);
-    rbt_destroy(h->right);
+    rbt_destroy(h->left, free_items_fnct, free_items);
+    rbt_destroy(h->right, free_items_fnct, free_items);
 
     string_destroy(h->key);
-    list_destroy(h->list_values); // libera a lista, mas não os valores guardados
+    list_destroy(h->list_values, free_items_fnct, free_items); // libera a lista, e, opcionalmente, os valores guardados
     free(h);
 }
 
