@@ -79,11 +79,14 @@ void iterator_destroy(ListIterator *it) {
     free(it);
 }
 
-void list_destroy(List *l) {
+void list_destroy(List *l, act_fnct free_fnct, int free_items) {
     Node *n = l->first;
     while(n != NULL) {
         Node *next = n->next;
-        free(n); // libera o nó, não o n->item (que é de outro dono)
+        if(free_items) {
+            free_fnct(n->item);
+        }
+        free(n); // libera o nó, e, opcionalmente, o item guardado
         n = next;
     }
     free(l);
