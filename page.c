@@ -74,6 +74,6 @@ List *page_get_links(Page *p) {
 void page_destroy(void *page) {
     Page *p = (Page *) page;
     string_destroy(p->page_name);
-    list_destroy(p->out_links);
+    list_destroy(p->out_links, page_destroy, 0);
     free(p);
 }
