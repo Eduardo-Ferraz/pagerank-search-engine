@@ -4,86 +4,114 @@
 #include "linked_list.h"
 
 typedef struct node Node;
-struct node {
+struct node
+{
     void *item;
     Node *next;
 };
 
-struct listIterator {
+struct listIterator
+{
     Node *current;
 };
 
-struct list {
+struct list
+{
     Node *first;
     Node *last;
 };
 
-List *list_create() {
-    List *l = (List *) malloc(sizeof(List));
+List *list_create()
+{
+    List *l = (List *)malloc(sizeof(List));
+
     l->first = l->last = NULL;
     return l;
 }
 
-ListIterator *iterator_create(List *l) {
-    ListIterator *it = (ListIterator *) malloc(sizeof(ListIterator));
+ListIterator *iterator_create(List *l)
+{
+    ListIterator *it = (ListIterator *)malloc(sizeof(ListIterator));
+
     it->current = l->first;
+
     return it;
 }
 
-void *get_and_advance(ListIterator *it) {
+void *get_and_advance(ListIterator *it)
+{
     void *item;
-    if(it->current) {
+    if (it->current)
+    {
         item = it->current->item;
+
         it->current = it->current->next;
-    } else {
+    }
+    else
+    {
         item = NULL;
     }
 
     return item;
 }
 
-void list_insert(List *l, void *item, compare_items cmp_item) {
-    Node *n = (Node *) malloc(sizeof(Node));
+void list_insert(List *l, void *item, compare_items cmp_item)
+{
+    Node *n = (Node *)malloc(sizeof(Node));
+
     n->item = item;
+
     n->next = NULL;
 
-    // case 1 - empty list
-    if(l->first == NULL) {
+    // caso 1 - lista vazia
+    if (l->first == NULL)
+    {
         l->first = l->last = n;
         return;
     }
 
-    // PT-BR:
     // Para o nosso caso, se um elemento se repetir, ele vai acontecer sucessivamente.
     // Então, vou verificar se o último valor é igual ao que vai ser inserido. Se for, não
     // insere.
-    if(cmp_item(item, l->last->item) == 0) {
+    if (cmp_item(item, l->last->item) == 0)
+    {
         free(n);
         return;
     }
 
-    // else, insert on the end
+    // senão, insere no fim
     l->last->next = n;
     l->last = n;
 }
 
-void traverse_list(List *l, act_fnct act) {
+void traverse_list(List *l, act_fnct act)
+{
+    if (l == NULL)
+    {
+        return; // consulta sem resultado: nada a percorrer
+    }
     Node *n = l->first;
-    while(n != NULL) {
+    while (n != NULL)
+    {
         act(n->item);
         n = n->next;
     }
 }
 
-void iterator_destroy(ListIterator *it) {
+void iterator_destroy(ListIterator *it)
+{
     free(it);
 }
 
-void list_destroy(List *l, act_fnct free_fnct, int free_items) {
+void list_destroy(List *l, act_fnct free_fnct, int free_items)
+{
     Node *n = l->first;
-    while(n != NULL) {
+
+    while (n != NULL)
+    {
         Node *next = n->next;
-        if(free_items) {
+        if (free_items)
+        {
             free_fnct(n->item);
         }
         free(n); // libera o nó, e, opcionalmente, o item guardado
@@ -93,14 +121,18 @@ void list_destroy(List *l, act_fnct free_fnct, int free_items) {
 }
 
 // adiciona o item no fim da lista, sem checar repetição
-void list_append(List *l, void *item) {
-    Node *n = (Node *) malloc(sizeof(Node));
+void list_append(List *l, void *item)
+{
+    Node *n = (Node *)malloc(sizeof(Node));
     n->item = item;
     n->next = NULL;
 
-    if(l->first == NULL) {
+    if (l->first == NULL)
+    {
         l->first = l->last = n;
-    } else {
+    }
+    else
+    {
         l->last->next = n;
         l->last = n;
     }
