@@ -46,6 +46,7 @@ void page_print(void *page)
 {
     Page *p = (Page *)page;
     fputs(p->page_name, stdout);
+    printf(" ");
 }
 
 void page_set_id(Page *p, int id)

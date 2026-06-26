@@ -54,7 +54,7 @@ void flip_colors(RBT *h)
     h->right->color = BLACK;
 }
 
-RBT *insert(RBT *h, char *key, void *value, compare_values cmp_val)
+static RBT *insert(RBT *h, char *key, void *value, compare_values cmp_val)
 {
     if (h == NULL)
     {
@@ -141,6 +141,14 @@ List *rbt_search(RBT *h, char *key)
     }
 
     return NULL; // não achou
+}
+
+void rbt_traverse(RBT *rbt, void (*visit)(char *key, List* value, void *context), void *context) {
+    if(rbt == NULL) return;
+
+    rbt_traverse(rbt->left, visit, context);
+    visit(rbt->key, rbt->list_values, context);
+    rbt_traverse(rbt->right, visit, context);
 }
 
 void rbt_destroy(RBT *h, act_fnct free_items_fnct, int free_items)
