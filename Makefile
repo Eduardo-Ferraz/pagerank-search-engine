@@ -1,5 +1,5 @@
-trab2: main.o linked_list.o rb_tree.o page.o indexer.o
-	gcc -Wall -Wextra -g -o trab2 main.o linked_list.o rb_tree.o page.o indexer.o
+trab2: main.o linked_list.o rb_tree.o page.o indexer.o graph.o pagerank.o
+	gcc -Wall -Wextra -g -o trab2 main.o linked_list.o rb_tree.o page.o indexer.o graph.o pagerank.o
 
 main.o: main.c page.h rb_tree.h linked_list.h
 	gcc -Wall -Wextra -g -c main.c
@@ -15,6 +15,12 @@ page.o: page.c page.h linked_list.h
 
 indexer.o: indexer.c indexer.h
 	gcc -Wall -Wextra -g -c indexer.c
+
+graph.o: graph.c graph.h
+	gcc -Wall -Wextra -g -c graph.c
+
+pagerank.o: pagerank.c pagerank.h
+	gcc -Wall -Wextra -g -c pagerank.c
 
 # cleans object files and the executable
 .PHONY: clean
