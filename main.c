@@ -5,7 +5,7 @@
 #include "rb_tree.h"
 #include "indexer.h"
 #include "linked_list.h"
-#include "graph.c"
+#include "graph.h"
 #include "pagerank.h"
 
 
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     /**
     Lê o index.txt e cria uma struct Page para cada
     página listada no index.txt
-    Também, conta quantas páginas foram lidas
+    Também, conta quantas páginas foram lidas e cria um vetor de páginas para auxiliar no cálculo do pagerank
     */
     Page **pages;
     int n = 0;
@@ -128,6 +128,13 @@ int main(int argc, char *argv[])
     // Teste de consulta à tabela de símbolos (passa a palavra direto, sem alocar)
     List *l = rbt_search(symbol_table, "abacate");
     traverse_list(l, page_print);
+    printf("\n\n");
+
+    // Teste de cálculo dos valores de rank
+    for(int i = 0; i < n; i++)
+    {
+        printf("ID:%d, pagerank:%lf\n",page_get_id(pages[i]), page_get_rank(pages[i]));
+    }
     printf("\n");
 
     free(pages);
