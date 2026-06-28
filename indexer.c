@@ -9,6 +9,10 @@ typedef struct {
     RBT *indexer_tree;
     char *source_dir;
     char *buffer;
+
+    // Ponteiro para montar a lista de páginas (usada no pagerank) 
+    // (como já se sabe a quantidade de nós) da árvore, não preciso passar internamente).
+    Page **pages;
 } IndexerContext;
 
 static void visit_page_node(char *key, List *value, void *indexer_context);
@@ -33,13 +37,16 @@ static void mount_page_path(char *source_dir, char *page_name, char *buffer)
  * 
  * 
  */
-RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, char *buffer) {
+RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, char *buffer, Page **pages) {
     // Criando contexto
     IndexerContext *indexer_context = (IndexerContext *) malloc(sizeof(IndexerContext));
     indexer_context->indexer_tree = rbt_create();
     indexer_context->stopwords_tree = stopwords_tree;
     indexer_context->source_dir = source_dir;
     indexer_context->buffer = buffer;
+
+    // Para montar a lista de páginas (usada no pagerank)
+    indexer_context->pages = pages;
 
     // Visitando cada nó recursivamente
     rbt_traverse(pages_tree, visit_page_node, indexer_context);
@@ -54,6 +61,11 @@ RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, 
 
 // Função de visita do indexador
 static void visit_page_node(char *key, List *value, void *indexer_context) {
+    // Seta o ID das páginas de maneira sequencial (id menor para a menor página)
+    // Observação:
+    // Isto é feito aqui pois, dessa forma, será insensível à ordem que o index.txt forneceu as páginas.
+    static int count = 0;
+
     // Desempacota contexto
     IndexerContext *context = (IndexerContext *) indexer_context;
     char *buffer = context->buffer;
@@ -63,6 +75,11 @@ static void visit_page_node(char *key, List *value, void *indexer_context) {
     Page *p = (Page *) get_and_advance(it);
     iterator_destroy(it);
     mount_page_path(context->source_dir, get_page_name(p), buffer);
+
+    // Setando id da página e salvando no vetor de páginas (Para o page rank)
+    context->pages[count] = p;
+    page_set_id(p, count);
+    count++;
 
     /**
      * Agora, basta abrir o arquivo e ler as palavras, adicionando-as à árvore do indexador.
@@ -81,7 +98,7 @@ static void visit_page_node(char *key, List *value, void *indexer_context) {
     {
         if (!rbt_search(context->stopwords_tree, buffer))
         {
-            context->indexer_tree = rbt_insert(context->indexer_tree, buffer, p, page_compare);
+            context->indexer_tree = rbt_insert(context->indexer_tree, buffer, p, page_name_compare);
         }
     }
 

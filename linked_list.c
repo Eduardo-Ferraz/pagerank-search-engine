@@ -17,6 +17,7 @@ struct listIterator
 
 struct list
 {
+    int num_itens;
     Node *first;
     Node *last;
 };
@@ -24,7 +25,8 @@ struct list
 List *list_create()
 {
     List *l = (List *)malloc(sizeof(List));
-
+    
+    l->num_itens = 0;
     l->first = l->last = NULL;
     return l;
 }
@@ -67,6 +69,7 @@ void list_insert(List *l, void *item, compare_items cmp_item)
     if (l->first == NULL)
     {
         l->first = l->last = n;
+        l->num_itens++;
         return;
     }
 
@@ -82,6 +85,7 @@ void list_insert(List *l, void *item, compare_items cmp_item)
     // senão, insere no fim
     l->last->next = n;
     l->last = n;
+    l->num_itens++;
 }
 
 void traverse_list(List *l, act_fnct act)
@@ -96,6 +100,10 @@ void traverse_list(List *l, act_fnct act)
         act(n->item);
         n = n->next;
     }
+}
+
+int get_list_length(List *l) {
+    return l != NULL ? l->num_itens : 0;
 }
 
 void iterator_destroy(ListIterator *it)
@@ -136,4 +144,74 @@ void list_append(List *l, void *item)
         l->last->next = n;
         l->last = n;
     }
+
+    l->num_itens++;
+}
+
+void copy_list_to_vector(List *l, void **vector) {
+    int i = 0;
+    
+    if (l == NULL)
+    {
+        return; // consulta sem resultado: nada a percorrer
+    }
+    Node *n = l->first;
+    while (n != NULL)
+    {
+        vector[i] = n->item;
+        i++;
+        n = n->next;
+    }
+}
+
+/**
+ * Faz a interseção da lista com o vetor.
+ * 
+ * Observação: Esta função pressupõe que tanto o vector, quanto, a lista, estão ordenados.
+ * Portanto, se aproveita disso para fazer a intersecção.
+ * 
+ * Guarda o resultado dentro do vetor. 
+ * 
+ * Retorna o tamanho "válido" do vetor.
+ */
+int intersect_list_with_vector(List *l, void **vector, int vector_size, compare_items compare_fnct) {
+    int n = 0; // Número de intersecções encontradas
+    int k = 0; // Posição para guardar os valores da intersecção
+    int i = 0; // índice para caminhar no vetor
+    Node *node = l->first;
+
+    while((i < vector_size) && (node != NULL)) {
+        int cmp = compare_fnct(vector[i], node->item);
+        // Nesse caso, o elemento do vetor é menor que o elemento da lista.
+        // Portanto, não há intersecção, preciso avançar a leitura no vetor para tentar "igualar à lista".
+
+        // Obs.: Note que, portanto, não incremento K (enquanto incremento i). Isto significa, (na primeira iteração, pelo menos)
+        // Que a posição 0 do vetor pode ser sobrescrita, pois não há intersecção neste elemento.
+
+        // O pensamento se repete para as iterações posteriores.
+        if(cmp < 0) {
+            i++;
+        }
+        // Nesse caso, o elemento do vetor é maior que o elemento da lista.
+        // Portanto, não há intersecção, preciso avançar a leitura da lista para tentar "igualar" ao vetor.
+        else if(cmp > 0) {
+            node = node->next;
+        }
+
+        // Nesse caso, houve intersecção, eu faço o shift do vector na primeira posição válida para escrita.
+        // E avanço a posição da escrita. Assim como o ponteiro da lista, e o índice do vector.
+
+        // Também incrementa a quantidade de intersecções encontradas.
+        else {
+            vector[k] = vector[i];
+            n++;
+            k++;
+
+            i++;
+            node = node->next;
+        }
+    }
+
+
+    return n;
 }

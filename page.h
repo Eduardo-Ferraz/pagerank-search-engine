@@ -7,7 +7,9 @@ typedef struct page Page;
 
 Page *page_create(char *page_name);
 void page_destroy(void *page);
-int page_compare(void *p1, void *p2);
+int page_name_compare(void *p1, void *p2);
+int page_id_compare(void *p1, void *p2);
+int page_rank_compare_qosrt(const void *p1, const void *p2);
 char *get_page_name(Page *p);
 void page_print(void *page);
 

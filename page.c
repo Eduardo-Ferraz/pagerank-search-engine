@@ -30,11 +30,37 @@ Page *page_create(char *page_name)
 
 // compara duas páginas pelo nome (sem diferenciar maiúscula de minúscula).
 // retorna < 0 se p1 < p2, > 0 se p1 > p2, e 0 se forem iguais.
-int page_compare(void *p1, void *p2)
+int page_name_compare(void *p1, void *p2)
 {
     Page *page_1 = (Page *)p1;
     Page *page_2 = (Page *)p2;
     return strcasecmp(page_1->page_name, page_2->page_name);
+}
+
+// compara duas páginas pelo id
+// retorna < 0 se p1 < p2, > 0 se p1 > p2, e 0 se forem iguais.
+int page_id_compare(void *p1, void *p2) 
+{
+    Page *page_1 = (Page *)p1;
+    Page *page_2 = (Page *)p2;
+    // printf("comparando %s:%d com %s:%d\n", page_1->page_name, page_1->id, page_2->page_name, page_2->id);
+    return page_1->id - page_2->id;
+}
+
+int page_rank_compare_qosrt(const void *p1, const void *p2)
+{
+    Page *page_1 = *(Page **)p1;
+    Page *page_2 = *(Page **)p2;
+
+    double diff = page_1->page_rank - page_2->page_rank;
+    
+    if(diff > 0) {
+        return -1;
+    } else if(diff < 0) {
+        return 1;
+    } else {
+        return strcasecmp(page_1->page_name, page_2->page_name);
+    }
 }
 
 char *get_page_name(Page *p)
