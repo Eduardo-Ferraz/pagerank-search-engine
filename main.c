@@ -234,7 +234,7 @@ void print_search_result(char *search, void **intersection_vector, int sz)
         {
             printf(" ");
         }
-        printf("%.8f", page_get_rank(intersection_vector[i]));
+        printf("%f", page_get_rank(intersection_vector[i]));
     }
     printf("\n");
 }
