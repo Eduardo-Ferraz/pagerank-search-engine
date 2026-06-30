@@ -8,11 +8,11 @@
 #include "graph.h"
 #include "pagerank.h"
 
-List *get_smaller_list(char *search, RBT* symbol_table, RBT *stopwords_tree);
-int mount_intersection_vector(char *search, void **vector, int vector_size, RBT* symbol_table, RBT *stopwords_tree);
+List *get_smaller_list(char *search, RBT *symbol_table, RBT *stopwords_tree);
+int mount_intersection_vector(char *search, void **vector, int vector_size, RBT *symbol_table, RBT *stopwords_tree);
 void print_search_result(char *search, void **intersection_vector, int sz);
 
-RBT* mount_pages_tree(char *source_dir, char *buffer, int *n_out)
+RBT *mount_pages_tree(char *source_dir, char *buffer, int *n_out)
 {
     RBT *pages_tree = rbt_create();
 
@@ -34,7 +34,7 @@ RBT* mount_pages_tree(char *source_dir, char *buffer, int *n_out)
         // tira o \n do fim
         buffer[strcspn(buffer, "\n")] = '\0';
         page = page_create(buffer); // page_create faz a própria cópia do nome
-        page_set_id(page, count); // seta id das páginas
+        page_set_id(page, count);   // seta id das páginas
         pages_tree = rbt_insert(pages_tree, buffer, page, page_name_compare);
 
         count++;
@@ -46,7 +46,7 @@ RBT* mount_pages_tree(char *source_dir, char *buffer, int *n_out)
     return pages_tree;
 }
 
-RBT *mount_stopwords_tree(char* source_dir, char *buffer)
+RBT *mount_stopwords_tree(char *source_dir, char *buffer)
 {
     RBT *stopwords_tree = rbt_create();
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     Também, conta quantas páginas foram lidas e cria um vetor de páginas para auxiliar no cálculo do pagerank
     */
     int n_pages = 0;
-    RBT* pages_tree = mount_pages_tree(source_dir, buffer, &n_pages);
+    RBT *pages_tree = mount_pages_tree(source_dir, buffer, &n_pages);
 
     /**
     Lê todas as stop words e armazena na árvore rubro negra (não terão valores associados,
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     Aproveita essa função para montar uma lista de páginas ordenada lexicograficamente.
     */
-    Page **pages = (Page **) malloc(sizeof(Page *)*n_pages);
+    Page **pages = (Page **)malloc(sizeof(Page *) * n_pages);
     RBT *symbol_table = mount_symbol_table(pages_tree, stopwords_tree, source_dir, buffer, pages);
 
     /**
@@ -115,20 +115,9 @@ int main(int argc, char *argv[])
     */
     pagerank_compute(pages, n_pages);
 
-    // Teste de consulta à tabela de símbolos (passa a palavra direto, sem alocar)
-    // List *l = rbt_search(symbol_table, "abacate");
-    // traverse_list(l, page_print);
-    // printf("\n\n");
-
-    // Teste de cálculo dos valores de rank
-    for(int i = 0; i < n_pages; i++)
-    {
-        printf("ID:%d, pagerank:%lf\n",page_get_id(pages[i]), page_get_rank(pages[i]));
-    }
-    printf("\n");
-
     // Search
-    while(fgets(buffer, 256, stdin) != NULL) {
+    while (fgets(buffer, 256, stdin) != NULL)
+    {
         // tira o \n do fim
         buffer[strcspn(buffer, "\n")] = '\0';
 
@@ -137,19 +126,20 @@ int main(int argc, char *argv[])
         int intersection_max_size = get_list_length(smaller_list);
         int intersection_size = 0;
 
-        if(intersection_max_size != 0) {
+        if (intersection_max_size != 0)
+        {
             void *intersection_vector[intersection_max_size];
 
             copy_list_to_vector(smaller_list, intersection_vector);
 
-            intersection_size = mount_intersection_vector(buffer, intersection_vector, intersection_max_size, symbol_table, stopwords_tree);   
+            intersection_size = mount_intersection_vector(buffer, intersection_vector, intersection_max_size, symbol_table, stopwords_tree);
 
             print_search_result(buffer, intersection_vector, intersection_size);
-        } else {
+        }
+        else
+        {
             print_search_result(buffer, NULL, 0);
         }
-
-
     }
 
     free(pages);
@@ -160,16 +150,20 @@ int main(int argc, char *argv[])
 
 // Função que modifica o vector original, deixando apenas a interseção das listas.
 // Retorna a quantidade de intersecções encontradas.
-int mount_intersection_vector(char *search, void **vector, int vector_size, RBT* symbol_table, RBT *stopwords_tree) {
+int mount_intersection_vector(char *search, void **vector, int vector_size, RBT *symbol_table, RBT *stopwords_tree)
+{
     char *search_copy = strdup(search);
 
     List *list = NULL;
     char *word = strtok(search_copy, " ");
     int sz = vector_size;
 
-    while(word != NULL) {
-        if(!rbt_search(stopwords_tree, word)) {
-            if((list = rbt_search(symbol_table, word)) != NULL) {
+    while (word != NULL)
+    {
+        if (!rbt_search(stopwords_tree, word))
+        {
+            if ((list = rbt_search(symbol_table, word)) != NULL)
+            {
                 sz = intersect_list_with_vector(list, vector, sz, page_id_compare);
             }
         }
@@ -182,19 +176,24 @@ int mount_intersection_vector(char *search, void **vector, int vector_size, RBT*
     return sz;
 }
 
-List *get_smaller_list(char *search, RBT* symbol_table, RBT *stopwords_tree) {
+List *get_smaller_list(char *search, RBT *symbol_table, RBT *stopwords_tree)
+{
     char *search_copy = strdup(search);
 
     List *smaller_list = NULL;
     List *list = NULL;
     char *word = strtok(search_copy, " ");
 
-    while(word != NULL) {
-        if(!rbt_search(stopwords_tree, word)) {
-            if((list = rbt_search(symbol_table, word)) != NULL) {
-                if(smaller_list == NULL) smaller_list = list;
+    while (word != NULL)
+    {
+        if (!rbt_search(stopwords_tree, word))
+        {
+            if ((list = rbt_search(symbol_table, word)) != NULL)
+            {
+                if (smaller_list == NULL)
+                    smaller_list = list;
 
-                if(get_list_length(list) < get_list_length(smaller_list))
+                if (get_list_length(list) < get_list_length(smaller_list))
                     smaller_list = list;
             }
         }
@@ -207,26 +206,35 @@ List *get_smaller_list(char *search, RBT* symbol_table, RBT *stopwords_tree) {
     return smaller_list;
 }
 
-void print_search_result(char *search, void **intersection_vector, int sz) {
-    if(intersection_vector != NULL) {
+void print_search_result(char *search, void **intersection_vector, int sz)
+{
+    if (intersection_vector != NULL)
+    {
         qsort(intersection_vector, sz, sizeof(void *), page_rank_compare_qosrt);
     }
-    
+
     printf("search:%s\n", search);
 
     printf("pages:");
-    for(int i = 0; i < sz; i++) {
-        printf("%s ", get_page_name(intersection_vector[i]));
+    for (int i = 0; i < sz; i++)
+    {
+        // espaço entre páginas, não no fim da linha
+        if (i > 0)
+        {
+            printf(" ");
+        }
+        printf("%s", get_page_name(intersection_vector[i]));
     }
-
     printf("\n");
 
     printf("pr:");
-    for(int i = 0; i < sz; i++) {
-        printf("%.8f ", page_get_rank(intersection_vector[i]));
+    for (int i = 0; i < sz; i++)
+    {
+        if (i > 0)
+        {
+            printf(" ");
+        }
+        printf("%.8f", page_get_rank(intersection_vector[i]));
     }
-
     printf("\n");
 }
-
-
