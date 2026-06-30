@@ -1,5 +1,5 @@
 trab2: main.o linked_list.o rb_tree.o page.o indexer.o graph.o pagerank.o
-	gcc -Wall -Wextra -g -o trab2 main.o linked_list.o rb_tree.o page.o indexer.o graph.o pagerank.o
+	gcc -Wall -Wextra -g -o trab2 main.o linked_list.o rb_tree.o page.o indexer.o graph.o pagerank.o -lm
 
 main.o: main.c page.h rb_tree.h linked_list.h
 	gcc -Wall -Wextra -g -c main.c
