@@ -162,10 +162,15 @@ int mount_intersection_vector(char *search, void **vector, int vector_size, RBT 
     {
         if (!rbt_search(stopwords_tree, word))
         {
-            if ((list = rbt_search(symbol_table, word)) != NULL)
+            list = rbt_search(symbol_table, word);
+            if (list == NULL)
             {
-                sz = intersect_list_with_vector(list, vector, sz, page_id_compare);
+                // termo não existe em nenhum documento: resultado vazio
+                sz = 0;
+                break;
             }
+
+            sz = intersect_list_with_vector(list, vector, sz, page_id_compare);
         }
 
         word = strtok(NULL, " ");
@@ -188,13 +193,17 @@ List *get_smaller_list(char *search, RBT *symbol_table, RBT *stopwords_tree)
     {
         if (!rbt_search(stopwords_tree, word))
         {
-            if ((list = rbt_search(symbol_table, word)) != NULL)
+            list = rbt_search(symbol_table, word);
+            if (list == NULL)
             {
-                if (smaller_list == NULL)
-                    smaller_list = list;
+                // termo não existe em nenhum documento: resultado vazio
+                free(search_copy);
+                return NULL;
+            }
 
-                if (get_list_length(list) < get_list_length(smaller_list))
-                    smaller_list = list;
+            if (smaller_list == NULL || get_list_length(list) < get_list_length(smaller_list))
+            {
+                smaller_list = list;
             }
         }
 

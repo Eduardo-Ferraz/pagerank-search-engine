@@ -4,15 +4,19 @@
 #include "page.h"
 #include "linked_list.h"
 
-typedef struct {
+typedef struct
+{
     RBT *stopwords_tree;
     RBT *indexer_tree;
     char *source_dir;
     char *buffer;
 
-    // Ponteiro para montar a lista de páginas (usada no pagerank) 
+    // Ponteiro para montar a lista de páginas (usada no pagerank)
     // (como já se sabe a quantidade de nós) da árvore, não preciso passar internamente).
     Page **pages;
+
+    // contador de páginas já visitadas (id de cada pag)
+    int count;
 } IndexerContext;
 
 static void visit_page_node(char *key, List *value, void *indexer_context);
@@ -24,22 +28,23 @@ static void mount_page_path(char *source_dir, char *page_name, char *buffer)
 
 /**
  * Explicação:
- * 
+ *
  * Dado que eu tenho uma árvore de páginas (pós leitura do index.txt), eu preciso:
- * 
+ *
  * 1. Percorrer cada nó da árvore individualmente;
  * 2. Para cada página, eu monto o path completo até o arquivo.txt dela;
  * 3. Leio esse arquivo.txt e insiro as palavras na árvore do Indexador;
- * 
+ *
  * Observação: A struct de contexto é para poder deixar a função de percorrer a árvore genérica.
- * Todas as informações que a função de callback precise usar (que não seja unicamente as informações do nó - 
+ * Todas as informações que a função de callback precise usar (que não seja unicamente as informações do nó -
  * que são as únicas informações que o TAD rb_tree.h tem acesso) devem ser inseridas nessas struct de contexto.
- * 
- * 
+ *
+ *
  */
-RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, char *buffer, Page **pages) {
+RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char *source_dir, char *buffer, Page **pages)
+{
     // Criando contexto
-    IndexerContext *indexer_context = (IndexerContext *) malloc(sizeof(IndexerContext));
+    IndexerContext *indexer_context = (IndexerContext *)malloc(sizeof(IndexerContext));
     indexer_context->indexer_tree = rbt_create();
     indexer_context->stopwords_tree = stopwords_tree;
     indexer_context->source_dir = source_dir;
@@ -47,6 +52,7 @@ RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, 
 
     // Para montar a lista de páginas (usada no pagerank)
     indexer_context->pages = pages;
+    indexer_context->count = 0;
 
     // Visitando cada nó recursivamente
     rbt_traverse(pages_tree, visit_page_node, indexer_context);
@@ -60,34 +66,32 @@ RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char* source_dir, 
 }
 
 // Função de visita do indexador
-static void visit_page_node(char *key, List *value, void *indexer_context) {
-    // Seta o ID das páginas de maneira sequencial (id menor para a menor página)
-    // Observação:
-    // Isto é feito aqui pois, dessa forma, será insensível à ordem que o index.txt forneceu as páginas.
-    static int count = 0;
-
+static void visit_page_node(char *key, List *value, void *indexer_context)
+{
     // Desempacota contexto
-    IndexerContext *context = (IndexerContext *) indexer_context;
+    IndexerContext *context = (IndexerContext *)indexer_context;
     char *buffer = context->buffer;
 
     // Retorno o ponteiro para a página e cria, no buffer, o path até ela.
     ListIterator *it = iterator_create(value);
-    Page *p = (Page *) get_and_advance(it);
+    Page *p = (Page *)get_and_advance(it);
     iterator_destroy(it);
     mount_page_path(context->source_dir, get_page_name(p), buffer);
 
-    // Setando id da página e salvando no vetor de páginas (Para o page rank)
-    context->pages[count] = p;
-    page_set_id(p, count);
-    count++;
+    // id menor para a menor página.
+    // Insensível à ordem que index.txt forneceu (árvore visita na ordem alfabética ).
+    context->pages[context->count] = p;
+    page_set_id(p, context->count);
+    context->count++;
 
     /**
      * Agora, basta abrir o arquivo e ler as palavras, adicionando-as à árvore do indexador.
-     * 
+     *
      * Obs.: Apenas se a palavra não for uma stopword.
      * */
     FILE *f_page = fopen(buffer, "r");
-    if(!f_page) {
+    if (!f_page)
+    {
         perror("Erro ao ler os arquivos de páginas.");
         exit(1);
     }
