@@ -1,0 +1,5 @@
+Caso de teste com todas as páginas tendo apenas stopwords.
+
+A busca também será por stopwords. Não deve ser possível buscar.
+
+Útil para verificar se não quebra e não há vazamento de memória.

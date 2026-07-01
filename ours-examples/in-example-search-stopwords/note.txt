@@ -1,0 +1,3 @@
+Caso de teste com todas as buscas sendo stopwords.
+
+Útil para verificar se não quebra e não há vazamento de memória.

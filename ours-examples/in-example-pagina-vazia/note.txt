@@ -1,0 +1,4 @@
+Caso de teste com todas as páginas vazias.
+
+Útil para verificar se seu programa não quebra. E se não há vazamento de memória.
+Todas as buscas devem não ser possíveis.

@@ -1,0 +1,3 @@
+Caso de teste com todos os pageranks iguais.
+
+Útil para verificar se, em caso de empate, a ordem alfabética (crescente) é mantida.
