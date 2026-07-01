@@ -25,7 +25,6 @@ RBT *mount_pages_tree(char *source_dir, char *buffer, int *n_out)
         exit(1);
     }
 
-    int capacity = 16;
     int count = 0;
 
     Page *page;
