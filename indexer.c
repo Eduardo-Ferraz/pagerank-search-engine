@@ -68,6 +68,9 @@ RBT *mount_symbol_table(RBT *pages_tree, RBT *stopwords_tree, char *source_dir, 
 // Função de visita do indexador
 static void visit_page_node(char *key, List *value, void *indexer_context)
 {
+    // void para silenciar warning
+    (void) key;
+
     // Desempacota contexto
     IndexerContext *context = (IndexerContext *)indexer_context;
     char *buffer = context->buffer;
