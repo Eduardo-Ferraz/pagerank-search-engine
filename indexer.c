@@ -98,7 +98,7 @@ static void visit_page_node(char *key, List *value, void *indexer_context)
 
     // Lê palavra por palavra. Passa o próprio buffer direto pra árvore: não
     // aloca nada aqui, a árvore só copia a palavra quando o termo é novo.
-    while (fscanf(f_page, " %255[a-zA-Z0-9-]", buffer) == 1)
+    while (fscanf(f_page, " %1023[a-zA-Z0-9-]", buffer) == 1)
     {
         if (!rbt_search(context->stopwords_tree, buffer))
         {

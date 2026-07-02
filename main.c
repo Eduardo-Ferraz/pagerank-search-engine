@@ -28,7 +28,7 @@ RBT *mount_pages_tree(char *source_dir, char *buffer, int *n_out)
     int count = 0;
 
     Page *page;
-    while ((fgets(buffer, 256, f_index) != NULL))
+    while ((fgets(buffer, 1024, f_index) != NULL))
     {
         // tira o \n do fim
         buffer[strcspn(buffer, "\n")] = '\0';
@@ -127,13 +127,15 @@ int main(int argc, char *argv[])
 
         if (intersection_max_size != 0)
         {
-            void *intersection_vector[intersection_max_size];
+            void **intersection_vector = (void **)malloc(intersection_max_size * sizeof(void *));
 
             copy_list_to_vector(smaller_list, intersection_vector);
 
             intersection_size = mount_intersection_vector(buffer, intersection_vector, intersection_max_size, symbol_table, stopwords_tree);
 
             print_search_result(buffer, intersection_vector, intersection_size);
+            
+            free(intersection_vector);
         }
         else
         {
