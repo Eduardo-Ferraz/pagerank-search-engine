@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     }
 
     char *source_dir = argv[1];
-    char buffer[256];
+    char buffer[1024];
 
     /**
     Lê o index.txt e cria uma struct Page para cada
@@ -242,7 +242,7 @@ void print_search_result(char *search, void **intersection_vector, int sz)
         {
             printf(" ");
         }
-        printf("%f", page_get_rank(intersection_vector[i]));
+        printf("%.17f", page_get_rank(intersection_vector[i]));
     }
     printf("\n");
 }
